@@ -38,7 +38,7 @@ class Tag < ActiveRecord::Base
     end
     
     def options_for_counts(options = {})
-      options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :joins
+      options.assert_valid_keys :start_at, :end_at, :conditions, :at_least, :at_most, :order, :limit, :joins, :ignore_scope
       options = options.dup
       
       start_at = sanitize_sql(["#{Tagging.table_name}.created_at >= ?", options.delete(:start_at)]) if options[:start_at]
