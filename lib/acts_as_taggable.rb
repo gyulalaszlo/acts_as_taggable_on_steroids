@@ -156,6 +156,7 @@ module ActiveRecord #:nodoc:
           end
           joins = joins.join(" ")
           
+          options.delete(:ignore_scope)
           options = { :conditions => conditions, :joins => joins }.update(options)
           
           Tag.options_for_counts(options)
