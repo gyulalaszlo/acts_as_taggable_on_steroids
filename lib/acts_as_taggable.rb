@@ -130,6 +130,7 @@ module ActiveRecord #:nodoc:
         # Calculate the tag counts for all tags.
         # 
         # See Tag.counts for available options.
+        # use options[:ignore_scope] to ignore errors in rails 3
         def tag_counts(options = {})
           Tag.find(:all, find_options_for_tag_counts(options))
         end
@@ -140,7 +141,9 @@ module ActiveRecord #:nodoc:
           
           conditions = []
           conditions << send(:sanitize_conditions, options.delete(:conditions)) if options[:conditions]
-          conditions << send(:sanitize_conditions, scope[:conditions]) if scope && scope[:conditions]
+          unless options[:ignore_scope]
+            conditions << send(:sanitize_conditions, scope[:conditions]) if scope && scope[:conditions]
+          end
           conditions << "#{Tagging.table_name}.taggable_type = #{quote_value(base_class.name)}"
           conditions << type_condition unless descends_from_active_record? 
           conditions.compact!
@@ -148,7 +151,9 @@ module ActiveRecord #:nodoc:
           
           joins = ["INNER JOIN #{table_name} ON #{table_name}.#{primary_key} = #{Tagging.table_name}.taggable_id"]
           joins << options.delete(:joins) if options[:joins].present?
-          joins << scope[:joins] if scope && scope[:joins].present?
+          unless options[:ignore_scope]          
+            joins << scope[:joins] if scope && scope[:joins].present?
+          end
           joins = joins.join(" ")
           
           options = { :conditions => conditions, :joins => joins }.update(options)
